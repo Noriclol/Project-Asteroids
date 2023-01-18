@@ -413,6 +413,10 @@ PrefabInstance:
       value: GameManager
       objectReference: {fileID: 0}
     - target: {fileID: 8594519646150521681, guid: 2a0f69f2696b0d04887b08fb934b3821, type: 3}
+      propertyPath: settings
+      value: 
+      objectReference: {fileID: 11400000, guid: e69584f3ec2321348af57de700d7e740, type: 2}
+    - target: {fileID: 8594519646150521681, guid: 2a0f69f2696b0d04887b08fb934b3821, type: 3}
       propertyPath: asteroidCount
       value: 10
       objectReference: {fileID: 0}

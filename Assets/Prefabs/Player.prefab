@@ -251,9 +251,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   projectile: {fileID: 8775471411622061419, guid: e5ad2f40a2a4d974abe76270ddf4c761, type: 3}
   projectileSpawnpoint: {fileID: 4922930562666307464}
-  rigidbody: {fileID: 2845907001415454782}
-  BR: {fileID: 655196454639225197}
-  BL: {fileID: 4406873041455811343}
+  rigidBody: {fileID: 2845907001415454782}
+  thrusterRight: {fileID: 655196454639225197}
+  thrusterLeft: {fileID: 4406873041455811343}
   thrustInput: 0
   turnInput: 0
   thrustMultiplier: 5

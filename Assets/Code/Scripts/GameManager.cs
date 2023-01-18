@@ -8,6 +8,10 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
+
+    [SerializeField] 
+    private DifficultySetting settings;
+    
     
     [SerializeField]
     private GameObject ShipPrefab;
@@ -52,15 +56,33 @@ public class GameManager : MonoBehaviour
 
     public void SpawnAsteroid()
     {
+        Vector3 targetDistance = new Vector3(Random.Range(-settings.AsteroidTargetSpawnRadius, settings.AsteroidTargetSpawnRadius), 0, Random.Range(-settings.AsteroidTargetSpawnRadius, settings.AsteroidTargetSpawnRadius));
 
+        Vector3 targetArea = (Random.insideUnitCircle.normalized * settings.AsteroidTargetingOffset);
 
-        int rNumber = Random.Range(0, AsteroidTypes.Count);
-        Vector3 newLocation = Random.insideUnitCircle * 10;
+        var neeww = targetDistance + targetArea;
+        
+        int index = Random.Range(0, AsteroidTypes.Count);
 
-        var newAsteroid = Instantiate(AsteroidTypes[rNumber].prefab, newLocation, quaternion.identity);
+        Vector3 spawnPosition = (Random.insideUnitCircle.normalized * settings.AsteroidSpawnDistance);
+
+        Vector3 targetPosition = spawnPosition + (spawnPosition - transform.position).normalized * Vector3.Distance(spawnPosition, transform.position);
+        
+        
+        
+        var newAsteroid = Instantiate(AsteroidTypes[index].prefab, spawnPosition, quaternion.identity);
         var handle = newAsteroid.GetComponent<AsteroidHandle>();
-        handle.Init();
+        handle.Init(((transform.position - spawnPosition).normalized * 1000));
         Asteroids.Add(handle);
+        
+    }
+
+
+    public void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        
+        Gizmos.DrawWireSphere(transform.position, settings.AsteroidSpawnDistance);
         
     }
 }

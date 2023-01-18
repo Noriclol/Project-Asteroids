@@ -22,7 +22,13 @@ public class AsteroidHandle : MonoBehaviour
         gameObject.GetComponent<Rigidbody2D>().AddForce((newpos - transform.position) * asteroid.fragmentationForce);
         gameObject.GetComponent<Rigidbody2D>().AddTorque(Random.Range(-20, 20));
     }
-    
+
+    public void Init(Vector2 direction, float torque = 20)
+    {
+        this.health = asteroid.health;
+        gameObject.GetComponent<Rigidbody2D>().AddForce((direction));
+        gameObject.GetComponent<Rigidbody2D>().AddTorque(Random.Range(-torque, torque));
+    }
     
     private List<GameObject> CreateFragments()
     {

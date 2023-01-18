@@ -15,13 +15,13 @@ public class ShipController : MonoBehaviour
     private float projectileForce = 10f;
     
     [SerializeField]
-    private Rigidbody2D rigidbody;
+    private Rigidbody2D rigidBody;
     
     [SerializeField]
-    private ParticleSystem BR;
+    private ParticleSystem thrusterRight;
     
     [SerializeField]
-    private ParticleSystem BL;
+    private ParticleSystem thrusterLeft;
     
     
     [SerializeField]
@@ -34,6 +34,10 @@ public class ShipController : MonoBehaviour
 
     public float thrustMultiplier = 5f;
     public float turnMultiplier = 5f;
+
+    private bool isThrusting => thrustInput >= 1;
+    private bool isTurningLeft => turnInput >= 1;
+    private bool isTurningRight => turnInput <= -1;
     
     // Movement fields
     private float thrust;
@@ -45,11 +49,10 @@ public class ShipController : MonoBehaviour
 
     private void OnEnable()
     {
-        if (controls == null)
-            controls = new GameControls();
+        controls ??= new GameControls();
 
-        if (rigidbody == null)
-            rigidbody = GetComponent<Rigidbody2D>();
+        if (!rigidBody)
+            rigidBody = GetComponent<Rigidbody2D>();
         
         
         controls.Enable();
@@ -84,26 +87,21 @@ public class ShipController : MonoBehaviour
         controls.Player.Thrust.Disable();
         controls.Player.Fire.Disable();
         controls.Disable();
-         }
+    }
     
     
     private void FixedUpdate()
     {
         ApplyForce();
         ApplyRotation();
+        AnimateThrusters();
+
         
     }
 
     private void LateUpdate()
     {
-        AnimateThrusters();
     }
-    // private void OnDrawGizmos()
-    // {
-    //     Gizmos.color = Color.green;
-    //     Gizmos.DrawRay(projectileSpawnpoint.position, projectileForce * transform.up);
-    // }
-
     #endregion
     
     
@@ -112,73 +110,56 @@ public class ShipController : MonoBehaviour
         var newProjectile = Instantiate(projectile, projectileSpawnpoint.position, transform.rotation);
         var projectileRB = newProjectile.GetComponent<Rigidbody2D>();
         
-        projectileRB.AddForce((Vector2)transform.up * projectileForce + rigidbody.velocity);
+        projectileRB.AddForce((Vector2)transform.up * projectileForce + rigidBody.velocity);
     }
 
     private void AnimateThrusters()
     {
-        if (thrustInput > 0)
-        {
-            BL.Play();
-            BR.Play();
-        }
-        
-        else if (turnInput < 0)
-        {
-            BL.Play();
-            BR.Stop();
-        }
-        
-        else if (turnInput > 0 )
-        {
-            BR.Play();
-            BL.Stop();
-        }
 
-        else
+        if (isThrusting)
         {
-            BL.Stop();
-            BR.Stop();
+            if (isTurningLeft)
+            {
+                thrusterLeft.Stop();
+                thrusterRight.Play();
+                return;
+            }
+            if (isTurningRight)
+            {
+                thrusterLeft.Play();
+                thrusterRight.Stop();
+                return;
+            }
+            thrusterLeft.Play();
+            thrusterRight.Play();
+            return;
         }
+        thrusterLeft.Stop();
+        thrusterRight.Stop();
     }
     
     private void Turn(InputAction.CallbackContext callbackContext)
     {
-        //Debug.Log($"Turning");
         turnInput = callbackContext.ReadValue<float>();
-        
-        if (turnInput < 0)
-        {
-            BL.Play();
-        }
-        else if (turnInput > 0 )
-        {
-            BR.Play();
-        }
-        
-        //Debug.Log($"Turn: {callbackContext.ReadValue<float>()}");
+
     }
 
     private void Thrust(InputAction.CallbackContext callbackContext)
     {
         //Debug.Log($"Thrust");
         thrustInput = callbackContext.ReadValue<float>();
-        
-
-        
-        //Debug.Log($"Thrust: {callbackContext.ReadValue<float>()}");
     }
     
 
     private void ApplyForce()
     {
-        rigidbody.AddForce(transform.up.normalized * (thrustInput * thrustMultiplier));
+        rigidBody.AddForce(transform.up.normalized * (thrustInput * thrustMultiplier));
     }
 
 
     private void ApplyRotation()
     {
-        rigidbody.SetRotation(rigidbody.rotation + turnInput * turnMultiplier);
+        rigidBody.SetRotation(rigidBody.rotation + turnInput * turnMultiplier);
 
     }
 
