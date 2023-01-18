@@ -20,7 +20,9 @@ public class Projectile : MonoBehaviour
         if (col.CompareTag("Asteroid"))
         {
             Debug.Log("Asteroid hit");
-            Destroy(col.gameObject);
+            var handle = col.GetComponent<AsteroidHandle>();
+            
+            handle.TakeDamage();
             Destroy(gameObject);
         }
     }

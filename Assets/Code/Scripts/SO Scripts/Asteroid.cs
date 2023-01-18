@@ -2,16 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+[CreateAssetMenu(fileName = "Unnamed Asteroid", menuName = "ScriptableObjects/Asteroids")]
 public class Asteroid : ScriptableObject
 {
-    private float health;
+    public GameObject prefab;
+    
+    public float health;
+    
+    public Asteroid fragmentation;
+    
+    public float fragmentationAmount;
 
-    private Asteroid Fragmentation;
-    private float FragmentationAmount;
+    public float fragmentationForce;
+    
+    public GameObject destroyAnim;
 
-
-    private void Fracture()
-    {
-        
-    }
 }

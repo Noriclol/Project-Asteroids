@@ -18,6 +18,13 @@ public class ShipController : MonoBehaviour
     private Rigidbody2D rigidbody;
     
     [SerializeField]
+    private ParticleSystem BR;
+    
+    [SerializeField]
+    private ParticleSystem BL;
+    
+    
+    [SerializeField]
     private GameControls controls;
 
     
@@ -77,16 +84,20 @@ public class ShipController : MonoBehaviour
         controls.Player.Thrust.Disable();
         controls.Player.Fire.Disable();
         controls.Disable();
-    }
+         }
     
     
     private void FixedUpdate()
     {
         ApplyForce();
         ApplyRotation();
+        
     }
 
-
+    private void LateUpdate()
+    {
+        AnimateThrusters();
+    }
     // private void OnDrawGizmos()
     // {
     //     Gizmos.color = Color.green;
@@ -101,14 +112,50 @@ public class ShipController : MonoBehaviour
         var newProjectile = Instantiate(projectile, projectileSpawnpoint.position, transform.rotation);
         var projectileRB = newProjectile.GetComponent<Rigidbody2D>();
         
-        projectileRB.AddForce((Vector2)transform.up * projectileForce);
+        projectileRB.AddForce((Vector2)transform.up * projectileForce + rigidbody.velocity);
     }
-    
+
+    private void AnimateThrusters()
+    {
+        if (thrustInput > 0)
+        {
+            BL.Play();
+            BR.Play();
+        }
+        
+        else if (turnInput < 0)
+        {
+            BL.Play();
+            BR.Stop();
+        }
+        
+        else if (turnInput > 0 )
+        {
+            BR.Play();
+            BL.Stop();
+        }
+
+        else
+        {
+            BL.Stop();
+            BR.Stop();
+        }
+    }
     
     private void Turn(InputAction.CallbackContext callbackContext)
     {
         //Debug.Log($"Turning");
         turnInput = callbackContext.ReadValue<float>();
+        
+        if (turnInput < 0)
+        {
+            BL.Play();
+        }
+        else if (turnInput > 0 )
+        {
+            BR.Play();
+        }
+        
         //Debug.Log($"Turn: {callbackContext.ReadValue<float>()}");
     }
 
@@ -116,6 +163,9 @@ public class ShipController : MonoBehaviour
     {
         //Debug.Log($"Thrust");
         thrustInput = callbackContext.ReadValue<float>();
+        
+
+        
         //Debug.Log($"Thrust: {callbackContext.ReadValue<float>()}");
     }
     
@@ -129,6 +179,7 @@ public class ShipController : MonoBehaviour
     private void ApplyRotation()
     {
         rigidbody.SetRotation(rigidbody.rotation + turnInput * turnMultiplier);
+
     }
 
 

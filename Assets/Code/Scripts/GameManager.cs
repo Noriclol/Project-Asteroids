@@ -12,17 +12,22 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject ShipPrefab;
 
-    [SerializeField] 
-    private GameObject AsteroidSmallPrefab;
+    //[SerializeField] 
+    //private GameObject AsteroidHandlePrefab;
     
     [SerializeField] 
-    private GameObject AsteroidLargePrefab;
-
-
     private int asteroidCount = 5;
 
+    [SerializeField] 
     private float asteroid_tourqeLimit = 5f;
+    
+    [SerializeField] 
     private float asteroid_speedLimit = 5f;
+    
+
+    public List<Asteroid> AsteroidTypes = new List<Asteroid>();
+
+    public List<AsteroidHandle> Asteroids = new List<AsteroidHandle>();
     
     
     private void Start()
@@ -39,28 +44,23 @@ public class GameManager : MonoBehaviour
     }
 
 
-    private void SpawnAsteroid()
+    private void ResetObjectVelocity(Transform obj)
     {
-        Vector3 newLocation = Random.insideUnitCircle * 5;
-
-        
-        
-        
-        
-        var newStroid = Instantiate(AsteroidSmallPrefab, newLocation, quaternion.identity);
-
-        newStroid.GetComponent<Rigidbody2D>().AddTorque(Random.Range(-asteroid_tourqeLimit, asteroid_tourqeLimit));
-        
-        
-        
-
+        var rb = obj.gameObject.GetComponent<Rigidbody2D>();
+        rb.velocity = Vector2.zero;
     }
 
-
-    private void FragmentAsteroid()
+    public void SpawnAsteroid()
     {
+
+
+        int rNumber = Random.Range(0, AsteroidTypes.Count);
+        Vector3 newLocation = Random.insideUnitCircle * 10;
+
+        var newAsteroid = Instantiate(AsteroidTypes[rNumber].prefab, newLocation, quaternion.identity);
+        var handle = newAsteroid.GetComponent<AsteroidHandle>();
+        handle.Init();
+        Asteroids.Add(handle);
         
     }
-    
-    
 }
