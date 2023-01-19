@@ -13,3 +13,11 @@ MonoBehaviour:
   m_Name: Testing
   m_EditorClassIdentifier: 
   AsteroidSpawnDistance: 20
+  AsteroidSpawnForce: 100
+  SpawnTimeInterval: 0.5
+  AsteroidsInCirculation: 10
+  Asteroids:
+  - {fileID: 11400000, guid: cde11032f20307b43ba98b262b737121, type: 2}
+  - {fileID: 11400000, guid: 26554abe4d9f3e24cb66e658d1b44ecc, type: 2}
+  targetMode: 2
+  AsteroidTargetingSize: 10

@@ -1,7 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-
 
 [CreateAssetMenu(fileName = "Unnamed Asteroid", menuName = "ScriptableObjects/Asteroids")]
 public class Asteroid : ScriptableObject

@@ -1,10 +1,8 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 
 public class GameManager : MonoBehaviour
 {
@@ -16,8 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject ShipPrefab;
 
-    //[SerializeField] 
-    //private GameObject AsteroidHandlePrefab;
+    private GameObject ShipInstance;
     
     [SerializeField] 
     private int asteroidCount = 5;
@@ -28,25 +25,44 @@ public class GameManager : MonoBehaviour
     [SerializeField] 
     private float asteroid_speedLimit = 5f;
     
-
-    public List<Asteroid> AsteroidTypes = new List<Asteroid>();
-
     public List<AsteroidHandle> Asteroids = new List<AsteroidHandle>();
+
+    public float GameTime;
+    public float TimeSinceLastAsteroidSpawned;
+
+
+    private Vector3 lastSpawnPos;
+    private Vector3 lastTargetPos;
+    private Vector3 lastTargetVector;
+    
+    
     
     
     private void Start()
     {
+        
+        var spawnPos = Random.insideUnitCircle * 10;
         //Spawn Player
-        Instantiate(ShipPrefab, Vector3.zero, quaternion.identity);
+        ShipInstance = Instantiate(ShipPrefab, spawnPos, quaternion.identity);
         
-        
-        //Spawn Asteroids
-        for (int i = 0; i < asteroidCount; i++)
+    }
+    
+    
+    //private void 
+    
+
+    private void Update()
+    {
+        GameTime += Time.deltaTime;
+        TimeSinceLastAsteroidSpawned += Time.deltaTime;
+
+        if (TimeSinceLastAsteroidSpawned >= settings.SpawnTimeInterval && Asteroids.Count < settings.AsteroidsInCirculation)
         {
+            Debug.Log("AsteroidCreated");
             SpawnAsteroid();
+
         }
     }
-
 
     private void ResetObjectVelocity(Transform obj)
     {
@@ -56,25 +72,53 @@ public class GameManager : MonoBehaviour
 
     public void SpawnAsteroid()
     {
-        Vector3 targetDistance = new Vector3(Random.Range(-settings.AsteroidTargetSpawnRadius, settings.AsteroidTargetSpawnRadius), 0, Random.Range(-settings.AsteroidTargetSpawnRadius, settings.AsteroidTargetSpawnRadius));
-
-        Vector3 targetArea = (Random.insideUnitCircle.normalized * settings.AsteroidTargetingOffset);
-
-        var neeww = targetDistance + targetArea;
         
-        int index = Random.Range(0, AsteroidTypes.Count);
+        Vector3 spawnPosition = Random.insideUnitCircle.normalized * settings.AsteroidSpawnDistance;
+        lastSpawnPos = spawnPosition;
 
-        Vector3 spawnPosition = (Random.insideUnitCircle.normalized * settings.AsteroidSpawnDistance);
-
-        Vector3 targetPosition = spawnPosition + (spawnPosition - transform.position).normalized * Vector3.Distance(spawnPosition, transform.position);
+        var targetAimDirection =  (ReturnTargetPos() - spawnPosition).normalized;
+        lastTargetPos = ReturnTargetPos();
+        lastTargetVector = targetAimDirection;
+        // Spawn
+        var index = Random.Range(0, settings.Asteroids.Count);
         
-        
-        
-        var newAsteroid = Instantiate(AsteroidTypes[index].prefab, spawnPosition, quaternion.identity);
+        var newAsteroid = Instantiate(settings.Asteroids[index].prefab, spawnPosition, quaternion.identity);
         var handle = newAsteroid.GetComponent<AsteroidHandle>();
-        handle.Init(((transform.position - spawnPosition).normalized * 1000));
-        Asteroids.Add(handle);
         
+        //Init and add Force
+        handle.Init(((Vector3)targetAimDirection - transform.position).normalized * 1000);
+        
+        Asteroids.Add(handle);
+        TimeSinceLastAsteroidSpawned = 0;
+    }
+
+
+    Vector3 ReturnTargetPos()
+    {
+        switch (settings.targetMode)
+        {
+            case DifficultySetting.TargetingMode.Center:
+                return Vector2.zero;
+            
+            case DifficultySetting.TargetingMode.General:
+                return Random.insideUnitCircle * settings.AsteroidTargetingSize;
+            
+            case DifficultySetting.TargetingMode.Player:
+                return  (Vector3)Random.insideUnitCircle + ShipInstance.gameObject.transform.position;
+            
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D col)
+    {
+        if (col.CompareTag("Asteroid"))
+        {
+            Debug.Log("Asteroid tagged");
+            if(Asteroids.Remove(col.gameObject.GetComponent<AsteroidHandle>()))
+                Destroy(col.gameObject);
+        }
     }
 
 
@@ -84,5 +128,54 @@ public class GameManager : MonoBehaviour
         
         Gizmos.DrawWireSphere(transform.position, settings.AsteroidSpawnDistance);
         
+        Gizmos.color = Color.red;
+        
+        Gizmos.DrawWireSphere(transform.position, 15);
+        
+        
+        
+        
+        
+        Gizmos.color = Color.cyan;
+
+        if (lastSpawnPos != Vector3.zero)
+            DrawAim(lastSpawnPos);
+
+            
+        
+        
+        
+        Gizmos.color = Color.magenta;
+        
+        if (lastTargetPos != Vector3.zero)
+            DrawAim(lastTargetPos);
+        
+        
+        
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawRay(lastSpawnPos, lastTargetVector * Vector3.Distance(lastSpawnPos, lastTargetPos));
+        
+        
+        
+        
     }
+
+
+    public void DrawAim(Vector3 position)
+    {
+    
+        Gizmos.DrawLine(position, position + Vector3.up);
+        Gizmos.DrawLine(position, position + Vector3.down);
+        Gizmos.DrawLine(position, position + Vector3.left);
+        Gizmos.DrawLine(position, position + Vector3.right);
+    }
+
+    public enum GameStates
+    {
+        Playing,
+        Win,
+        Lose
+    }
+    
+    
 }

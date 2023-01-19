@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -29,8 +26,8 @@ public class ShipController : MonoBehaviour
 
     
     // Input fields
-    public float thrustInput = 0f;
-    public float turnInput = 0f;
+    public float thrustInput;
+    public float turnInput;
 
     public float thrustMultiplier = 5f;
     public float turnMultiplier = 5f;
@@ -69,9 +66,7 @@ public class ShipController : MonoBehaviour
         controls.Player.Fire.performed += Shoot;
 
     }
-
-
-
+    
     private void OnDisable()
     {
         controls.Player.Turn.performed -= Turn;
