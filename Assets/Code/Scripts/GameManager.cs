@@ -6,31 +6,27 @@ using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-
-    [SerializeField] 
-    private DifficultySetting settings;
     
-    
+    // Game
     [SerializeField]
     private GameObject ShipPrefab;
-
     private GameObject ShipInstance;
     
     [SerializeField] 
-    private int asteroidCount = 5;
+    private DifficultySetting settings;
 
-    [SerializeField] 
-    private float asteroid_tourqeLimit = 5f;
-    
-    [SerializeField] 
-    private float asteroid_speedLimit = 5f;
-    
+    [HideInInspector]
     public List<AsteroidHandle> Asteroids = new List<AsteroidHandle>();
-
+    
+    
+    // Time
+    [HideInInspector]
     public float GameTime;
+    [HideInInspector]
     public float TimeSinceLastAsteroidSpawned;
 
-
+    
+    // Debug variables
     private Vector3 lastSpawnPos;
     private Vector3 lastTargetPos;
     private Vector3 lastTargetVector;
@@ -62,6 +58,8 @@ public class GameManager : MonoBehaviour
             SpawnAsteroid();
 
         }
+
+        this.transform.position = ShipInstance.transform.position;
     }
 
     private void ResetObjectVelocity(Transform obj)
@@ -101,7 +99,7 @@ public class GameManager : MonoBehaviour
                 return Vector2.zero;
             
             case DifficultySetting.TargetingMode.General:
-                return Random.insideUnitCircle * settings.AsteroidTargetingSize;
+                return Random.insideUnitCircle * settings.TargetingSize;
             
             case DifficultySetting.TargetingMode.Player:
                 return  (Vector3)Random.insideUnitCircle + ShipInstance.gameObject.transform.position;

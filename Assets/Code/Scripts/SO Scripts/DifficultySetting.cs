@@ -21,11 +21,8 @@ public class DifficultySetting : ScriptableObject
     [Header("Targeting")] 
     public TargetingMode targetMode;
     
-    public float AsteroidTargetingSize = 10;
-
+    public float TargetingSize = 10;
     
-    
-
     public enum TargetingMode
     {
         Center,
